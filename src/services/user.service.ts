@@ -100,6 +100,62 @@ async function findUserAndUpdate(query: FilterQuery<UserDocument>, update: Updat
     return User.findOneAndUpdate(query, update, options)
 }
 
+export interface GitHubUser {
+    login: string;
+    id: number;
+    node_id: string;
+    avatar_url: string;
+    gravatar_id: string;
+    url: string;
+    html_url: string;
+    followers_url: string;
+    following_url: string;
+    gists_url: string;
+    starred_url: string;
+    subscriptions_url: string;
+    organizations_url: string;
+    repos_url: string;
+    events_url: string;
+    received_events_url: string;
+    type: string;
+    site_admin: boolean;
+    name: string;
+    company: null;
+    blog: string;
+    location: string;
+    email: null;
+    hireable: null;
+    bio: null;
+    twitter_username: null;
+    public_repos: number;
+    public_gists: number;
+    followers: number;
+    following: number;
+    created_at: Date;
+    updated_at: Date;
+  }
+
+async function getGithubUser({ code }: { code: string }): Promise<GitHubUser> {
+    const GITHUB_CLIENT_ID = config.get<string>('githubClientId')
+    const GITHUB_CLIENT_SECRET = config.get<string>('githubSecret')
+
+    try {
+        const githubToken = await axios.post(
+            `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`
+        ).then(res => res.data).catch(err => { throw err })
+
+        const decoded = qs.parse(githubToken);
+        const accessToken = decoded.access_token
+        return axios.get<GitHubUser>(
+            "https://api.github.com/user",
+            { headers: { Authorization: `Bearer ${accessToken}`}}
+        ).then(res => res.data).catch(err => { throw err })
+    } catch(err) {
+        console.error(`Error getting user from GitHub`);
+        throw err
+    }
+}
+
 export {
     createUser,
     validatePassword,
@@ -108,5 +164,6 @@ export {
     findSessions,
     getGoogleOAuthTokens,
     getGoogleUser,
-    findUserAndUpdate
+    findUserAndUpdate,
+    getGithubUser
 }

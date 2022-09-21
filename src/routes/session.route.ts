@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createSessionHandler, deleteUserSessionHandler, getUserSessionsHandler, googleOAuthHandler } from "../controllers/session.controller";
+import { createSessionHandler, deleteUserSessionHandler, getCurrentGithubUser, getUserSessionsHandler, githubOAuthHandler, googleOAuthHandler } from "../controllers/session.controller";
 import { deserializeUser } from "../middlewares/deserializeUser";
 import requireUser from "../middlewares/requireUser";
 import validate from "../middlewares/validateResource";
@@ -15,7 +15,9 @@ router.route('/api/sessions')
     .delete(requireUser, deleteUserSessionHandler)
 
 
-router.route("/api/sessions/oauth/google")
-    .get(googleOAuthHandler)
+router.get("/api/sessions/oauth/google", googleOAuthHandler)
+router.get("/api/auth/github", githubOAuthHandler)
+router.get("/api/me", getCurrentGithubUser)
+
 
 export default router;

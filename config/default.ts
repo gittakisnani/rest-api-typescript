@@ -14,5 +14,9 @@ G7USvB3dUzubvoTjAgMBAAE=
 -----END PUBLIC KEY-----`,
     clientId: '',
     secret: "",
-    redirectUri: ''
+    redirectUri: '',
+    githubClientId: '',
+    githubSecret: '',
+    githubCallbackUrl: '',
+    cookieName: ''
 }

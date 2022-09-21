@@ -1,11 +1,14 @@
-import { signJWT } from "../utils/jwt.utils";
+import { signJWT, verifyJWT } from "../utils/jwt.utils";
 import { createSession, updateSession } from "../services/session.service";
-import { validatePassword, findSessions, getGoogleOAuthTokens, getGoogleUser, findUserAndUpdate } from '../services/user.service'
+import { validatePassword, findSessions, getGoogleOAuthTokens, getGoogleUser, findUserAndUpdate, getGithubUser, GitHubUser } from '../services/user.service'
 import { Response, Request, CookieOptions } from "express";
 import config from 'config'
 import { SessionDocument } from "../models/session.model";
 import { LeanDocument } from "mongoose";
 import { logger } from "../utils/logger";
+import { get } from "lodash";
+import User from "../models/user.model";
+import { sign, verify } from "jsonwebtoken";
 
 
 const cookiesOptions: CookieOptions = {
@@ -111,10 +114,41 @@ async function googleOAuthHandler(req: Request, res:Response) {
     }
 }
 
+async function githubOAuthHandler(req: Request, res: Response) {
+    const code = get(req, "query.code")
+    const path = get(req, "query.path", "/")
+
+    if(!code) {
+        return res.status(400).json({ message: "Could not authenticate with github"})
+    }
+
+    const gitHubUser = await getGithubUser({ code });
+
+    const token = sign(gitHubUser, 'shhhh')
+
+    res.cookie(config.get<string>('cookieName'), token, {domain: 'localhost', maxAge: 1000 * 60 * 24 })
+
+    res.redirect(`http://localhost:3000${path}`)
+}
+
+async function getCurrentGithubUser(req: Request, res: Response) {
+    const cookie = get(req, `cookies[${config.get<string>('cookieName')}]`)
+    try {
+        const user = verify(cookie, 'shhhh')
+
+        return res.status(200).json(user)
+    } catch(err) {
+        return res.send(null)
+    }
+}
+
+
 export {
     createSessionHandler, 
     getUserSessionsHandler, 
     deleteUserSessionHandler, 
     deleteAllUserSessions,
-    googleOAuthHandler
+    googleOAuthHandler,
+    githubOAuthHandler,
+    getCurrentGithubUser
 }
