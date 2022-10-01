@@ -12,7 +12,7 @@ async function createSession(userId: string, userAgent: string): Promise<Flatten
 }
 
 async function updateSession(query: FilterQuery<SessionDocument>, update: UpdateQuery<SessionDocument>) : Promise<UpdateQuery<SessionDocument>> {
-    return await Session.updateOne(query, update).lean().exec()
+    return Session.updateOne(query, update).lean().exec()
 }
 
 async function reIssueAccessToken({ refreshToken } : { refreshToken: string }) : Promise<boolean | string > {

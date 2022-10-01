@@ -9,15 +9,15 @@ async function createProduct(input: ProductInput) : Promise<FlattenMaps<ProductD
 }
 
 async function findAndUpdateProduct(query: FilterQuery<ProductDocument>, update: UpdateQuery<ProductDocument>, options?: QueryOptions) {
-    return await Product.findOneAndUpdate(query, update, options).exec()
+    return Product.findOneAndUpdate(query, update, options).exec()
 }
 
 async function findProduct(query: FilterQuery<ProductDocument>, options: QueryOptions = { lean: true }) {
-    return await Product.findOne(query, {}, options).exec()
+    return Product.findOne(query, {}, options).exec()
 }
 
 async function deleteProduct(query: FilterQuery<ProductDocument>) {
-    return await Product.findOneAndDelete(query);
+    return Product.findOneAndDelete(query);
 }
 
 

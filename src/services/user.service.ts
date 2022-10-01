@@ -25,11 +25,11 @@ async function validatePassword({ email, password }: Omit<UserInput, 'name'>) {
 }
 
 async function findUser(query: FilterQuery<UserDocument>) : Promise<LeanDocument<UserDocument> | null> {
-    return await User.findOne(query).lean().exec()
+    return User.findOne(query).lean().exec()
 }
 
 async function findSessions(query: FilterQuery<SessionDocument>) : Promise<LeanDocument<SessionDocument>[]> {
-    return await Session.find(query).lean().exec()
+    return Session.find(query).lean().exec()
 }
 
 async function getAllUsers() {
